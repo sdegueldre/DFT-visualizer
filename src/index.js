@@ -59,8 +59,8 @@ function playAnim(){
 	for(let i = 0; i < cv.width; i++) {
 		const data = [frame[0], frame[1]];
 		const len = data[0].length;
-    const left = Math.pow(data[0][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
-    const right = Math.pow(data[1][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
+    const left = data[0][~~(2**(i/120))] * (i/500 + 0.5) * cv.height/2;
+    const right = data[1][~~(2**(i/120))] * (i/500 + 0.5) * cv.height/2;
 		ctx.fillRect(i, cv.height/2, 1, -left*0.7);
     ctx.fillRect(i, cv.height/2, 1, right*0.7);
 	}
