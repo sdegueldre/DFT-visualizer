@@ -14,6 +14,6 @@
     "parcel-bundler": "^1.12.3"
   },
   "dependencies": {
-    "jsfft": "0.0.4"
+    "fourier-transform": "^1.1.2"
   }
 }
