@@ -40,6 +40,8 @@ function getFrame(time){
 	let right = rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
 	left = left.map((v, i) => v * (Math.cos(i/left.length*2*Math.PI + Math.PI) + 1));
 	right = right.map((v, i) => v * (Math.cos(i/right.length*2*Math.PI + Math.PI) + 1));
+	if(left.length != 2*halfWinsize)
+		return [[],[]];
 	return [
     [...ft(left)],
     [...ft(right)]
@@ -55,8 +57,8 @@ function playAnim(){
 		const len = data[0].length;
     const left = Math.pow(data[0][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
     const right = Math.pow(data[1][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
-		ctx.fillRect(i, cv.height/2, 1, -left);
-    ctx.fillRect(i, cv.height/2, 1, right);
+		ctx.fillRect(i, cv.height/2, 1, -left*0.7);
+    ctx.fillRect(i, cv.height/2, 1, right*0.7);
 	}
 	if(currentTime < audioElem.duration && !audioElem.paused)
 		window.requestAnimationFrame(playAnim);
