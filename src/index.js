@@ -36,9 +36,13 @@ let rightSamples;
 
 const halfWinsize = 1024;
 function getFrame(time){
+	let left = leftSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
+	let right = rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
+	left = left.map((v, i) => v * (Math.cos(i/left.length*2*Math.PI + Math.PI) + 1));
+	right = right.map((v, i) => v * (Math.cos(i/right.length*2*Math.PI + Math.PI) + 1));
 	return [
-    [...ft(leftSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize)))],
-    [...ft(rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize)))]
+    [...ft(left)],
+    [...ft(right)]
   ];
 }
 
