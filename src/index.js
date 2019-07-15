@@ -25,8 +25,6 @@ let rightSamples;
 	console.log(audioBuffer);
 	leftSamples = audioBuffer.getChannelData(0);
   rightSamples = audioBuffer.getChannelData(1);
-	console.log(leftSamples.slice(4096, 8192), rightSamples.slice(4096, 8192));
-	console.log(getFrame(6144/samplingRate));
 	console.log('Samples acquired');
 
 	document.querySelector('button').onclick = () => {
@@ -36,10 +34,11 @@ let rightSamples;
 	};
 })();
 
+const halfWinsize = 1024;
 function getFrame(time){
 	return [
-    [...ft(leftSamples.slice(Math.max(0, ~~(time*samplingRate) - 2048), Math.max(4096, ~~(time*samplingRate) + 2048)))],
-    [...ft(rightSamples.slice(Math.max(0, ~~(time*samplingRate) - 2048), Math.max(4096, ~~(time*samplingRate) + 2048)))]
+    [...ft(leftSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize)))],
+    [...ft(rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize)))]
   ];
 }
 
@@ -48,7 +47,7 @@ function playAnim(){
 	const currentTime = audioElem.currentTime;
 	const frame = getFrame(currentTime);
 	for(let i = 0; i < cv.width; i++) {
-		const data = [frame[0].slice(20, -512), frame[1].slice(20, -512)];
+		const data = [frame[0], frame[1]];
 		const len = data[0].length;
     const left = Math.pow(data[0][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
     const right = Math.pow(data[1][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
