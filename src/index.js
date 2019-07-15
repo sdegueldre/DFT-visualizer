@@ -27,14 +27,18 @@ let rightSamples;
   rightSamples = audioBuffer.getChannelData(1);
 	console.log('Samples acquired');
 
-	document.querySelector('button').onclick = () => {
-		playAnim();
-		audioElem.fastSeek(0);
-		audioElem.play();
+	document.querySelector('button').onclick = async () => {
+		if(audioElem.paused) {
+			await audioElem.play();
+			playAnim();
+		} else {
+			audioElem.pause();
+		}
+
 	};
 })();
 
-const halfWinsize = 1024;
+const halfWinsize = 2048;
 function getFrame(time){
 	let left = leftSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
 	let right = rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
@@ -58,6 +62,6 @@ function playAnim(){
 		ctx.fillRect(i, cv.height/2, 1, -left);
     ctx.fillRect(i, cv.height/2, 1, right);
 	}
-	if(currentTime < audioElem.duration)
+	if(currentTime < audioElem.duration && !audioElem.paused)
 		window.requestAnimationFrame(playAnim);
 }
