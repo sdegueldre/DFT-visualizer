@@ -32,6 +32,10 @@ let rightSamples;
 	audioElt.onplay = async () => {
 		playAnim();
 	};
+
+	if(!audioElt.paused) {
+		playAnim();
+	}
 })();
 
 const halfWinsize = 2048;
