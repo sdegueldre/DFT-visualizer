@@ -5,6 +5,8 @@ const db = require('decibels');
 const soundfile = require('../assets/audio/undertone.mpga');
 const audioElt = document.createElement('audio');
 audioElt.src = soundfile;
+audioElt.controls = true;
+audioElt.style = 'position: absolute; top: 0; right: 0; width: 100%;'
 document.body.appendChild(audioElt);
 
 const cv = document.querySelector('canvas');
@@ -27,14 +29,8 @@ let rightSamples;
   rightSamples = audioBuffer.getChannelData(1);
 	console.log('Samples acquired');
 
-	document.querySelector('button').onclick = async () => {
-		if(audioElem.paused) {
-			await audioElem.play();
-			playAnim();
-		} else {
-			audioElem.pause();
-		}
-
+	audioElt.onplay = async () => {
+		playAnim();
 	};
 })();
 
