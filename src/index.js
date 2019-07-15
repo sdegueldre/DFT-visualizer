@@ -2,7 +2,10 @@ import "babel-polyfill";
 
 const ft = require('fourier-transform/asm');
 const db = require('decibels');
-const undertone = require('../assets/audio/undertone.mpga');
+const soundfile = require('../assets/audio/undertone.mpga');
+const audioElt = document.createElement('audio');
+audioElt.src = soundfile;
+document.body.appendChild(audioElt);
 
 const cv = document.querySelector('canvas');
 cv.width = window.innerWidth;
@@ -16,11 +19,14 @@ let rightSamples;
 
 (async () => {
 	let audioCtx = new AudioContext();
-	const response = await fetch(undertone);
+	const response = await fetch(soundfile);
 	const data = await response.arrayBuffer();
 	const audioBuffer = await audioCtx.decodeAudioData(data);
+	console.log(audioBuffer);
 	leftSamples = audioBuffer.getChannelData(0);
   rightSamples = audioBuffer.getChannelData(1);
+	console.log(leftSamples.slice(4096, 8192), rightSamples.slice(4096, 8192));
+	console.log(getFrame(6144/samplingRate));
 	console.log('Samples acquired');
 
 	document.querySelector('button').onclick = () => {
@@ -31,10 +37,9 @@ let rightSamples;
 })();
 
 function getFrame(time){
-	const currFrame = ~~(time*60);
 	return [
-    ft(leftSamples.slice(Math.max(0, currFrame*samplingRate/60 - 2048), Math.max(4096, currFrame*samplingRate/60 + 2048))),
-    ft(rightSamples.slice(Math.max(0, currFrame*samplingRate/60 - 2048), Math.max(4096, currFrame*samplingRate/60 + 2048)))
+    [...ft(leftSamples.slice(Math.max(0, ~~(time*samplingRate) - 2048), Math.max(4096, ~~(time*samplingRate) + 2048)))],
+    [...ft(rightSamples.slice(Math.max(0, ~~(time*samplingRate) - 2048), Math.max(4096, ~~(time*samplingRate) + 2048)))]
   ];
 }
 
@@ -44,8 +49,9 @@ function playAnim(){
 	const frame = getFrame(currentTime);
 	for(let i = 0; i < cv.width; i++) {
 		const data = [frame[0].slice(20, -512), frame[1].slice(20, -512)];
-    const left = Math.pow(data[0][~~(2**(i/80))], 0.3) * (i/500 + 0.5) * cv.height/2;
-    const right = Math.pow(data[1][~~(2**(i/80))], 0.3) * (i/500 + 0.5) * cv.height/2;
+		const len = data[0].length;
+    const left = Math.pow(data[0][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
+    const right = Math.pow(data[1][~~(2**(i/120))], 0.3) * (i/500 + 0.5) * cv.height/2;
 		ctx.fillRect(i, cv.height/2, 1, -left);
     ctx.fillRect(i, cv.height/2, 1, right);
 	}
