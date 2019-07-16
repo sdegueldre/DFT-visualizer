@@ -68,7 +68,7 @@ function playAnim(){
     const x = ln(j+1)*cv.width*hScale;
     return ({
       x: x,
-      y: ((i%2) ? v : -v) * cv.height/2 * (1 + (x/cv.width)) + cv.height/2
+      y: ((i%2) ? v : -v) * cv.height/2 * (Math.pow(25, x/cv.width)/2) + cv.height/2
     })
   }));
 
