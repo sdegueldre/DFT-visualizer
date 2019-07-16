@@ -59,22 +59,35 @@ function playAnim(){
 	ctx.clearRect(0,0,cv.width,cv.height);
 	const currentTime = audioElem.currentTime;
 	const data = getFrame(currentTime);
-  const frame = data.map((channel) => channel.map((v, i) => ({x: ln(i+1)*cv.width*hScale, y: v*cv.height/2})));
-  ctx.beginPath();
-  ctx.moveTo(0, cv.height/2);
-  frame.forEach((channel, i) => {
-    if(i%2) {
-      for(let point of channel){
-        ctx.lineTo(point.x, -point.y * (1 + (point.x/cv.width)) + cv.height/2);
-      }
-    } else {
-      for(let point of channel){
-        ctx.lineTo(point.x, point.y * (1 + (point.x/cv.width)) + cv.height/2);
-      }
+
+  const frame = data.map((channel, i) => channel.map((v, j) => {
+    const x = ln(j+1)*cv.width*hScale;
+    return ({
+      x: x,
+      y: ((i%2) ? v : -v) * cv.height/2 * (1 + (x/cv.width)) + cv.height/2
+    })
+  }));
+
+  frame.forEach(channel => {
+    ctx.beginPath();
+    ctx.moveTo(0, cv.height/2);
+    ctx.lineTo(0, channel[0].y);
+
+    for(let i = 1; i < channel.length - 1; i++){
+      const point = channel[i];
+      const next = channel[i+1];
+      const control = {
+        x: (point.x + next.x) * 0.5,
+        y: (point.y + next.y) * 0.5
+      };
+      ctx.quadraticCurveTo(point.x, point.y, control.x, control.y);
     }
+
+    ctx.lineTo(cv.width, channel[channel.length-1].y);
+    ctx.lineTo(cv.width, cv.height/2);
+    ctx.fill();
   })
-  ctx.lineTo(cv.width, cv.height/2);
-  ctx.fill();
+
 	if(currentTime < audioElem.duration && !audioElem.paused)
 		window.requestAnimationFrame(playAnim);
 }
