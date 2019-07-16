@@ -53,18 +53,28 @@ function getFrame(time){
   ];
 }
 
+const ln = Math.log;
+const hScale = 1/ln(halfWinsize + 1); // horizontal scaling factor
 function playAnim(){
 	ctx.clearRect(0,0,cv.width,cv.height);
 	const currentTime = audioElem.currentTime;
-	const frame = getFrame(currentTime);
-	for(let i = 0; i < cv.width; i++) {
-		const data = [frame[0], frame[1]];
-		const len = data[0].length;
-    const left = data[0][~~(2**(i/120))] * (i/500 + 0.5) * cv.height/2;
-    const right = data[1][~~(2**(i/120))] * (i/500 + 0.5) * cv.height/2;
-		ctx.fillRect(i, cv.height/2, 1, -left*0.7);
-    ctx.fillRect(i, cv.height/2, 1, right*0.7);
-	}
+	const data = getFrame(currentTime);
+  const frame = data.map((channel) => channel.map((v, i) => ({x: ln(i+1)*cv.width*hScale, y: v*cv.height/2})));
+  ctx.beginPath();
+  ctx.moveTo(0, cv.height/2);
+  frame.forEach((channel, i) => {
+    if(i%2) {
+      for(let point of channel){
+        ctx.lineTo(point.x, -point.y * (1 + (point.x/cv.width)) + cv.height/2);
+      }
+    } else {
+      for(let point of channel){
+        ctx.lineTo(point.x, point.y * (1 + (point.x/cv.width)) + cv.height/2);
+      }
+    }
+  })
+  ctx.lineTo(cv.width, cv.height/2);
+  ctx.fill();
 	if(currentTime < audioElem.duration && !audioElem.paused)
 		window.requestAnimationFrame(playAnim);
 }
