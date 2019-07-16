@@ -43,7 +43,7 @@ let rightSamples;
 	}
 })();
 
-const halfWinsize = 2048;
+const halfWinsize = 4096;
 function getFrame(time){
 	let left = leftSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
 	let right = rightSamples.slice(Math.max(0, ~~(time*samplingRate) - halfWinsize), Math.max(2*halfWinsize, ~~(time*samplingRate) + halfWinsize));
