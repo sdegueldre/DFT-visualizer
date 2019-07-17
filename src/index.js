@@ -94,6 +94,6 @@ function playAnim(){
     ctx.fill();
   })
 
-	if(currentTime < audioElem.duration && !audioElem.paused)
+	if(!audioElem.paused)
 		window.requestAnimationFrame(playAnim);
 }
