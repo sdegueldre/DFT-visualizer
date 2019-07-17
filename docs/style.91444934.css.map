@@ -1,1 +1,0 @@
-{"version":3,"sources":["style.css"],"names":[],"mappings":"AAAA,UACE,QAAS,CACT,SAAU,CACV,YAAa,CACb,oDACF","file":"style.91444934.css","sourceRoot":"../src","sourcesContent":["html, body {\n  margin: 0;\n  padding: 0;\n  display: flex;\n  background: linear-gradient(to bottom left, #222, black);\n}\n"]}
