@@ -73,6 +73,8 @@ function playAnim(){
   }));
 
   frame.forEach(channel => {
+		if(channel.length == 0)
+			return;
     ctx.beginPath();
     ctx.moveTo(0, cv.height/2);
     ctx.lineTo(0, channel[0].y);
