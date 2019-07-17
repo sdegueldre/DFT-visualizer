@@ -2,3 +2,4 @@
 /.cache/*
 /dist/*
 /assets/audio/*
+!/assets/audio/Komiku - Mushrooms.mp3

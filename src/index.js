@@ -2,7 +2,7 @@ import "babel-polyfill";
 
 const ft = require('fourier-transform/asm');
 const db = require('decibels');
-const soundfile = require('../assets/audio/undertone.mpga');
+const soundfile = require('../assets/audio/Komiku - Mushrooms.mp3');
 const audioElt = document.createElement('audio');
 audioElt.src = soundfile;
 audioElt.controls = true;
