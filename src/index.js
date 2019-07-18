@@ -20,17 +20,6 @@ gradient.addColorStop(0, '#30bf33');
 gradient.addColorStop(1, '#008ce2');
 ctx.fillStyle = gradient;
 
-window.addEventListener('resize', () => {
-	cv.width = window.innerWidth;
-	cv.height = window.innerHeight;
-	ctx = cv.getContext('2d');
-
-	gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
-	gradient.addColorStop(0, '#30bf33');
-	gradient.addColorStop(1, '#008ce2');
-	ctx.fillStyle = gradient;
-});
-
 const samplingRate = 44100;
 const audioElem = document.querySelector('audio');
 let leftSamples;
@@ -53,6 +42,19 @@ let rightSamples;
 	if(!audioElt.paused) {
 		playAnim();
 	}
+
+	window.addEventListener('resize', () => {
+		cv.width = window.innerWidth;
+		cv.height = window.innerHeight;
+		ctx = cv.getContext('2d');
+
+		gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
+		gradient.addColorStop(0, '#30bf33');
+		gradient.addColorStop(1, '#008ce2');
+		ctx.fillStyle = gradient;
+
+		playAnim();
+	});
 })();
 
 const halfWinsize = 4096;
