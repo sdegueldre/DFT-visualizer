@@ -43,6 +43,8 @@ let rightSamples;
 		playAnim();
 	}
 
+	audioElt.addEventListener('seeked', playAnim);
+
 	window.addEventListener('resize', () => {
 		cv.width = window.innerWidth;
 		cv.height = window.innerHeight;
