@@ -13,11 +13,23 @@ document.body.appendChild(audioElt);
 const cv = document.querySelector('canvas');
 cv.width = window.innerWidth;
 cv.height = window.innerHeight;
-const ctx = cv.getContext('2d');
-const gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
+let ctx = cv.getContext('2d');
+
+let gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
 gradient.addColorStop(0, '#30bf33');
 gradient.addColorStop(1, '#008ce2');
 ctx.fillStyle = gradient;
+
+window.addEventListener('resize', () => {
+	cv.width = window.innerWidth;
+	cv.height = window.innerHeight;
+	ctx = cv.getContext('2d');
+
+	gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
+	gradient.addColorStop(0, '#30bf33');
+	gradient.addColorStop(1, '#008ce2');
+	ctx.fillStyle = gradient;
+});
 
 const samplingRate = 44100;
 const audioElem = document.querySelector('audio');
