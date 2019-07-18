@@ -43,7 +43,11 @@ let rightSamples;
 		playAnim();
 	}
 
-	audioElt.addEventListener('seeked', playAnim);
+	audioElt.addEventListener('seeked', () => {
+		if(audioElt.paused) {
+			playAnim();
+		}
+	});
 
 	window.addEventListener('resize', () => {
 		cv.width = window.innerWidth;
