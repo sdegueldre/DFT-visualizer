@@ -24,29 +24,34 @@ const audioElem = document.querySelector('audio');
 let leftSamples;
 let rightSamples;
 
-(async () => {
-	let audioCtx = new AudioContext();
-	const response = await fetch(soundfile);
-	const data = await response.arrayBuffer();
-	const audioBuffer = await audioCtx.decodeAudioData(data);
-	console.log(audioBuffer);
-	leftSamples = audioBuffer.getChannelData(0);
-  rightSamples = audioBuffer.getChannelData(1);
-	console.log('Samples acquired');
+const input = document.querySelector('input');
+let startTime = 0;
+let audioCtx;
+let bufferSource;
 
-	audioElt.onplay = async () => {
-		playAnim();
-	};
-
-	if(!audioElt.paused) {
-		playAnim();
-	}
-
-	audioElt.addEventListener('seeked', () => {
-		if(audioElt.paused) {
-			playAnim();
+input.addEventListener('change', async (e) => {
+	const reader = new FileReader();
+	reader.readAsArrayBuffer(input.files[0]);
+	audioCtx = new AudioContext();
+	reader.onload = async () => {
+		if(bufferSource){
+			console.log('There was already a buffer source, stopping it...', bufferSource);
+			bufferSource.stop();
 		}
-	});
+		const audioBuffer = await audioCtx.decodeAudioData(reader.result);
+		bufferSource = audioCtx.createBufferSource();
+		bufferSource.buffer = audioBuffer;
+		bufferSource.connect(audioCtx.destination);
+		bufferSource.start();
+		console.log(bufferSource);
+		console.log(audioBuffer);
+		leftSamples = audioBuffer.getChannelData(0);
+	  rightSamples = audioBuffer.getChannelData(1);
+		startTime = audioCtx.currentTime;
+    if(!playing)
+		  playAnim();
+		console.log('Samples acquired');
+	}
 
 	window.addEventListener('resize', () => {
 		cv.width = window.innerWidth;
@@ -58,9 +63,10 @@ let rightSamples;
 		gradient.addColorStop(1, '#008ce2');
 		ctx.fillStyle = gradient;
 
-		playAnim();
+    if(!playing)
+		  playAnim();
 	});
-})();
+});
 
 const halfWinsize = 4096;
 function getFrame(time){
@@ -78,9 +84,12 @@ function getFrame(time){
 
 const ln = Math.log;
 const hScale = 1/ln(halfWinsize + 1); // horizontal scaling factor
+
+let playing = false;
 function playAnim(){
+  playing = true;
 	ctx.clearRect(0,0,cv.width,cv.height);
-	const currentTime = audioElem.currentTime;
+	const currentTime = audioCtx.currentTime - startTime;
 	const data = getFrame(currentTime);
 
   const frame = data.map((channel, i) => channel.map((v, j) => {
@@ -113,6 +122,5 @@ function playAnim(){
     ctx.fill();
   })
 
-	if(!audioElem.paused)
-		window.requestAnimationFrame(playAnim);
+  window.requestAnimationFrame(playAnim);
 }
