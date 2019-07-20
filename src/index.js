@@ -7,7 +7,6 @@ const audioElt = document.createElement('audio');
 audioElt.src = soundfile;
 audioElt.controls = true;
 audioElt.loop = true;
-audioElt.style = 'position: absolute; top: 0; right: 0; width: 100%;'
 document.body.appendChild(audioElt);
 
 const cv = document.querySelector('canvas');

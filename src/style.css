@@ -7,3 +7,9 @@ html, body {
 body {
   background: linear-gradient(to bottom left, #222, black);
 }
+
+audio {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
