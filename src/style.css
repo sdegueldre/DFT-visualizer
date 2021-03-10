@@ -8,15 +8,23 @@ body {
   background: linear-gradient(to bottom left, #222, black);
 }
 
-audio {
+.overlay {
   position: absolute;
   top: 0;
   width: 100%;
 }
 
-input {
-  position: absolute;
-  top: 50px;
-  left: 0px;
+audio {
+  width: 100%;
+}
+
+label {
+  margin: .5rem;
   color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+    margin-top: .5rem;
 }
