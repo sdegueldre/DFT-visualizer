@@ -13,6 +13,7 @@ gradient.addColorStop(1, '#008ce2');
 ctx.fillStyle = gradient;
 
 // TODO: this seems shitty. Should probably get sample rate from file...
+// This doesn't seem possible without parsing the files by hand unfortunately
 const samplingRate = 44100;
 let leftSamples, rightSamples;
 let cache = {};
@@ -28,8 +29,9 @@ function loadAudio(fileOrBlob) {
     const audioBuffer = await audioCtx.decodeAudioData(reader.result);
     leftSamples = audioBuffer.getChannelData(0);
     rightSamples = audioBuffer.getChannelData(1);
-    if (!playing)
+    if (!playing) {
       playAnim();
+    }
     console.log('Samples acquired');
   }
 }
@@ -56,8 +58,9 @@ window.addEventListener('resize', () => {
   gradient.addColorStop(1, '#008ce2');
   ctx.fillStyle = gradient;
 
-  if (!playing)
+  if (!playing) {
     playAnim();
+  }
 });
 
 const halfWinsize = 4096;
@@ -66,10 +69,14 @@ function getFrame(time) {
   const centerSample = roundTo(time * samplingRate, samplingRate / 30);
   // TODO: make cache actually useful
   if (!cache[centerSample]) {
-    let left = leftSamples.slice(Math.max(0, centerSample - halfWinsize), Math.max(2 * halfWinsize, centerSample + halfWinsize));
-    let right = rightSamples.slice(Math.max(0, centerSample - halfWinsize), Math.max(2 * halfWinsize, centerSample + halfWinsize));
-    left = left.map((v, i) => v * (Math.cos(i / left.length * 2 * Math.PI + Math.PI) + 1));
-    right = right.map((v, i) => v * (Math.cos(i / right.length * 2 * Math.PI + Math.PI) + 1));
+    const sliceStart = Math.max(0, centerSample - halfWinsize);
+    const sliceEnd = Math.max(2 * halfWinsize, centerSample + halfWinsize);
+    let left = leftSamples.slice(sliceStart, sliceEnd);
+    let right = rightSamples.slice(sliceStart, sliceEnd);
+    const scaleFactor = i => Math.cos(i / left.length * 2 * Math.PI + Math.PI) + 1;
+    left = left.map((v, i) => v * scaleFactor(i));
+    right = right.map((v, i) => v * scaleFactor(i));
+    // TODO: return something when close to boundaries
     if (left.length != 2 * halfWinsize) {
       cache[centerSample] = [
         [],
@@ -106,8 +113,9 @@ function playAnim() {
   }));
 
   channels.forEach(channel => {
-    if (channel.length == 0)
+    if (channel.length == 0) {
       return;
+    }
     ctx.beginPath();
     ctx.moveTo(0, cv.height / 2);
     ctx.lineTo(0, channel[0].y);
@@ -128,7 +136,7 @@ function playAnim() {
     ctx.fill();
   })
 
-  let now = Date.now();
+  const now = Date.now();
   if (lastFrameTime) {
     frameTimes.push(now - lastFrameTime);
   }
