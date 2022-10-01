@@ -1,3 +1,4 @@
+// Todo: use analyzer instead!
 import ft from 'fourier-transform/asm';
 const audioElt = document.querySelector('audio');
 const soundfile = audioElt.src;
