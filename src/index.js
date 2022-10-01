@@ -3,23 +3,23 @@ import ft from 'fourier-transform/asm';
 const audioElt = document.querySelector('audio');
 const soundfile = audioElt.src;
 
-const cv = document.querySelector('canvas');
-cv.width = window.innerWidth;
-cv.height = window.innerHeight;
+const cv = document.querySelector('#animation');
+const bg = document.querySelector("#background");
+cv.width = bg.width = window.innerWidth;
+cv.height = bg.height = window.innerHeight;
 let ctx = cv.getContext('2d');
+let bgCtx = bg.getContext("2d");
 
 let gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
 gradient.addColorStop(0, '#30bf33');
 gradient.addColorStop(1, '#008ce2');
 ctx.fillStyle = gradient;
 
-// TODO: this seems shitty. Should probably get sample rate from file...
-// This doesn't seem possible without parsing the files by hand unfortunately
-const samplingRate = 44100;
 let leftSamples, rightSamples;
 let cache = {};
 
 const audioCtx = new AudioContext();
+const samplingRate = audioCtx.sampleRate;
 
 function loadAudio(fileOrBlob) {
   const reader = new FileReader();
@@ -53,9 +53,10 @@ if (input.files.length) {
 }
 
 window.addEventListener('resize', () => {
-  cv.width = window.innerWidth;
-  cv.height = window.innerHeight;
+  cv.width = bg.width = window.innerWidth;
+  cv.height = bg.height = window.innerHeight;
   ctx = cv.getContext('2d');
+  bgCtx = bg.getContext("2d");
 
   gradient = ctx.createLinearGradient(0, 0, cv.width, cv.height);
   gradient.addColorStop(0, '#30bf33');
@@ -67,10 +68,10 @@ window.addEventListener('resize', () => {
   }
 });
 
-const halfWinsize = 4096;
+const halfWinsize = 1024;
 
 function getFrame(time) {
-  const centerSample = roundTo(time * samplingRate, samplingRate / 30);
+  const centerSample = roundTo(time * samplingRate, samplingRate / 60);
   // TODO: make cache actually useful
   if (!cache[centerSample]) {
     const sliceStart = Math.max(0, centerSample - halfWinsize);
@@ -109,12 +110,15 @@ function playAnim() {
   const data = leftSamples ? getFrame(audioElt.currentTime) : [];
 
   const channels = data.map((channel, i) => channel.map((v, j) => {
-    const x = ln(j + 1) * cv.width * hScale;
+    const x = j/channel.length * cv.width;
+    v = intensityOf(v);
     return ({
       x: x,
-      y: ((i % 2) ? v : -v) * cv.height / 2 * (Math.pow(25, x / cv.width) / 2) + cv.height / 2,
+      y: ((i % 2) ? v : -v) * cv.height / 2 + cv.height / 2,
+      // y: ((i % 2) ? v : -v) * cv.height / 2 * (Math.pow(25, x / cv.width) / 2) + cv.height / 2,
     })
   }));
+  drawBackgroundSlice(data, audioElt.currentTime / audioElt.duration * bg.width);
 
   channels.forEach(channel => {
     if (channel.length == 0) {
@@ -164,4 +168,23 @@ window.fillCache = () => {
   for (let i = 0; i < audioElt.duration; i += .001) {
     getFrame(i);
   }
+}
+
+const clamp = (n, min, max) => Math.max(Math.min(max, n), min);
+
+const log = Math.log10;
+const intensityOf = el => clamp((10*log(el) + 80)/80, 0, 1);
+function drawBackgroundSlice([left, right], x) {
+  x = ~~x;
+  bgCtx.clearRect(x, 0, 1, bg.height);
+  left.forEach((el, i) => {
+    const intensity = intensityOf(el)**2.2;
+    bgCtx.fillStyle = `rgb(255,255,255,${intensity})`;
+    bgCtx.fillRect(x, ~~((1 - i / left.length) * bg.height / 2), 1, 1);
+  });
+  right.forEach((el, i) => {
+    const intensity = intensityOf(el)**2.2;
+    bgCtx.fillStyle = `rgb(255,255,255,${intensity})`;
+    bgCtx.fillRect(x, ~~((i / left.length + 1) * bg.height / 2), 1, 1);
+  });
 }

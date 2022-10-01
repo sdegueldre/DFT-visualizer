@@ -2,6 +2,7 @@ html, body {
   margin: 0;
   padding: 0;
   display: flex;
+  font-family: sans-serif;
 }
 
 body {
@@ -27,4 +28,11 @@ label {
 
 input {
     margin-top: .5rem;
+}
+
+#background {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
 }
