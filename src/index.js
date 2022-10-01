@@ -37,17 +37,20 @@ function loadAudio(fileOrBlob) {
   }
 }
 
-// Load base audio file.
-(async () => {
-  const response = await fetch(soundfile);
-  loadAudio(await response.blob());
-})();
-
 const input = document.querySelector('input');
 input.addEventListener('change', async () => {
   cache = {};
   loadAudio(input.files[0]);
 });
+
+// Load base audio file.
+if (input.files.length) {
+  loadAudio(input.files[0]);
+} else {
+  fetch(soundfile).then(async response => {
+    loadAudio(await response.blob());
+  });
+}
 
 window.addEventListener('resize', () => {
   cv.width = window.innerWidth;
